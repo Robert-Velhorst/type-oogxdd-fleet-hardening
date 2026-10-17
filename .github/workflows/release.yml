@@ -152,7 +152,7 @@ jobs:
 
       - name: Build, sign & publish desktop release (Apple-signed)
         if: steps.apple.outputs.configured == 'true'
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Updater signing (required) — see docs/RELEASING.md.
@@ -178,7 +178,7 @@ jobs:
 
       - name: Build & publish desktop release (unsigned)
         if: steps.apple.outputs.configured != 'true'
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
