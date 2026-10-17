@@ -13,7 +13,7 @@
     "start": "node dist/main.mjs"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@modelcontextprotocol/sdk": "^1.32.1",
     "@typenotes/shared": "*",
     "@typenotes/note-document": "*",
     "@tiptap/core": "^3.19.0",
