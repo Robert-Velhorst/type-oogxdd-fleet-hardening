@@ -27,7 +27,7 @@ jobs:
       tag: ${{ steps.parse.outputs.tag }}
       build_number: ${{ steps.parse.outputs.build_number }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -104,7 +104,7 @@ jobs:
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID || 'prj_hQJ2vJZY73nDFw2gl2jPrXZU5ZC8' }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
