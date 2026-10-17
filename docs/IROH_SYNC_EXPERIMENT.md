@@ -9,7 +9,7 @@ paths, relays, and the sync logs fit together, see
 
 ## Version and stability boundary
 
-- Type pins Rust `1.97.1` in `rust-toolchain.toml`; the workspace manifests,
+- Type pins Rust `1.99.1` in `rust-toolchain.toml`; the workspace manifests,
   CI, desktop release, and iOS codegen all use that same toolchain.
 - The transport uses stable `iroh 1.0.3` and `iroh-tickets 1.0.0`.
 - The compatible blob protocol is `iroh-blobs 0.103.0`. Upstream explicitly
