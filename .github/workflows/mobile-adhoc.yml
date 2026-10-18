@@ -103,7 +103,6 @@ jobs:
       IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
       IOS_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
       IOS_AD_HOC_DEVICE_UDIDS: ${{ secrets.IOS_AD_HOC_DEVICE_UDIDS }}
-      OTA_BASE_URL: ${{ vars.IOS_AD_HOC_BASE_URL }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -135,22 +134,13 @@ jobs:
             APP_STORE_CONNECT_PRIVATE_KEY \
             IOS_DISTRIBUTION_CERTIFICATE_BASE64 \
             IOS_DISTRIBUTION_CERTIFICATE_PASSWORD \
-            IOS_AD_HOC_DEVICE_UDIDS \
-            OTA_BASE_URL
+            IOS_AD_HOC_DEVICE_UDIDS
           do
             [ -n "${!name:-}" ] || {
               echo "Missing required secret or variable: $name" >&2
               exit 1
             }
           done
-          [[ "$OTA_BASE_URL" == https://* ]] || {
-            echo "IOS_AD_HOC_BASE_URL must begin with https://, got $OTA_BASE_URL." >&2
-            exit 1
-          }
-          [[ "$OTA_BASE_URL" != *vercel.app* ]] || {
-            echo "Vercel OTA hosting is retired; configure the Hetzner HTTPS endpoint." >&2
-            exit 1
-          }
 
       - name: Install dependencies
         run: npm ci
@@ -293,30 +283,6 @@ jobs:
           [ "$PROFILE_COUNT" -gt 0 ]
           echo "Verified $ACTUAL_BUNDLE $ACTUAL_VERSION ($ACTUAL_BUILD) and $PROFILE_COUNT provisioning profile(s)."
 
-      - name: Build OTA install site
-        run: |
-          npm run ota -w @typenotes/mobile -- build \
-            "$RUNNER_TEMP/type-export-adhoc/Type.ipa" \
-            --base-url "$OTA_BASE_URL" \
-            --out "$RUNNER_TEMP/type-ota"
-
-      - name: Verify OTA deployment
-        shell: bash
-        run: |
-          set -euo pipefail
-          curl --fail --silent --show-error --location \
-            --retry 5 --retry-all-errors --retry-delay 5 \
-            -o /dev/null "$OTA_BASE_URL/"
-          MANIFEST="$(curl --fail --silent --show-error --location \
-            --retry 5 --retry-all-errors --retry-delay 5 \
-            "$OTA_BASE_URL/manifest.plist")"
-          printf '%s' "$MANIFEST" | grep -Fq "$OTA_BASE_URL/Type.ipa"
-          printf '%s' "$MANIFEST" | grep -Fq "$MOBILE_VERSION"
-          curl --fail --silent --show-error --location \
-            --retry 5 --retry-all-errors --retry-delay 5 \
-            --range 0-0 -o /dev/null "$OTA_BASE_URL/Type.ipa"
-          echo "Ad-hoc build is available at $OTA_BASE_URL"
-
       - name: Upload IPA artifact
         if: always()
         uses: actions/upload-artifact@v7
@@ -352,10 +318,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ needs.setup.outputs.tag }}
           VERSION: ${{ needs.setup.outputs.version }}
-          OTA_BASE_URL: ${{ vars.IOS_AD_HOC_BASE_URL }}
         run: |
           set -euo pipefail
-          RELEASE_NOTES="Ad-hoc iOS release $VERSION. Install on a registered device from $OTA_BASE_URL in Safari."
+          RELEASE_NOTES="Ad-hoc iOS release $VERSION. Download the attached IPA for installation on a registered device."
           if gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
             gh release edit "$TAG" \
               --repo "${{ github.repository }}" \
