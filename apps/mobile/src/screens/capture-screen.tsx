@@ -8,10 +8,11 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "
 import {
   Alert,
   type LayoutChangeEvent,
-  type ScrollView,
+  type ScrollViewInstance,
   StyleSheet,
   Text,
   TextInput,
+  type TextInputInstance,
   useWindowDimensions,
   View,
 } from "react-native";
@@ -122,11 +123,11 @@ export const CaptureScreen = ({ note }: { note?: NotePageRequest }) => {
   // that allocation inside the commit window.
   const micOpacity = useSharedValue(1);
   const runtimeStatus = useSyncExternalStore(mobileRuntime.subscribe, mobileRuntime.getStatus);
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<TextInputInstance>(null);
   // A plain ref, not useAnimatedRef: nothing reads the scroll view from a
   // worklet any more, and an animated ref only exists to be handed to the UI
   // runtime. See scrollToY below.
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
 
   // The keyboard height (0 when hidden) as a UI-thread shared value; the page
   // padding and the floating controls ride it so nothing hides under the

@@ -116,7 +116,7 @@ const RootStack = () => {
  * system camera) drops the remote into the sync store and jumps to the Sync
  * screen, which applies it.
  */
-const handleSyncUrl = (url: string | null) => {
+const handleSyncUrl = (url: string | null | undefined) => {
   const params = url ? parseSyncDeepLink(url) : null;
   if (!params) {
     return;
