@@ -40,7 +40,7 @@
   "dependencies": {
     "expo": "~57.0.4",
     "react": "19.2.7",
-    "react-native": "0.86.0"
+    "react-native": "0.87.1"
   },
   "overrides": {
     "image-size": "2.0.4",
