@@ -12384,7 +12384,7 @@ dependencies = [
 name = "type"
 version = "0.1.0"
 dependencies = [
- "base64 0.22.1",
+ "base64 0.23.1",
  "objc",
  "serde",
  "serde_json",
@@ -12402,7 +12402,7 @@ name = "type-core"
 version = "0.1.0"
 dependencies = [
  "argon2 0.5.3",
- "base64 0.22.1",
+ "base64 0.23.1",
  "chacha20poly1305",
  "git2",
  "hex",
