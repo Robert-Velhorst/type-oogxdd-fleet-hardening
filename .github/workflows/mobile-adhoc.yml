@@ -99,10 +99,7 @@ jobs:
       IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
       IOS_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
       IOS_AD_HOC_DEVICE_UDIDS: ${{ secrets.IOS_AD_HOC_DEVICE_UDIDS }}
-      OTA_BASE_URL: ${{ vars.IOS_AD_HOC_BASE_URL || 'https://type-ota.vercel.app' }}
-      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID || 'team_BfDOMB3NjBU2lgN9aNtFtJKC' }}
-      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID || 'prj_hQJ2vJZY73nDFw2gl2jPrXZU5ZC8' }}
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      OTA_BASE_URL: ${{ vars.IOS_AD_HOC_BASE_URL }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -134,9 +131,6 @@ jobs:
             APP_STORE_CONNECT_PRIVATE_KEY \
             IOS_DISTRIBUTION_CERTIFICATE_BASE64 \
             IOS_DISTRIBUTION_CERTIFICATE_PASSWORD \
-            VERCEL_ORG_ID \
-            VERCEL_PROJECT_ID \
-            VERCEL_TOKEN \
             IOS_AD_HOC_DEVICE_UDIDS \
             OTA_BASE_URL
           do
@@ -147,6 +141,10 @@ jobs:
           done
           [[ "$OTA_BASE_URL" == https://* ]] || {
             echo "IOS_AD_HOC_BASE_URL must begin with https://, got $OTA_BASE_URL." >&2
+            exit 1
+          }
+          [[ "$OTA_BASE_URL" != *vercel.app* ]] || {
+            echo "Vercel OTA hosting is retired; configure the Hetzner HTTPS endpoint." >&2
             exit 1
           }
 
@@ -298,12 +296,6 @@ jobs:
             --base-url "$OTA_BASE_URL" \
             --out "$RUNNER_TEMP/type-ota"
 
-      - name: Deploy OTA site to Vercel
-        run: |
-          set -euo pipefail
-          npx --yes vercel@59.11.2 deploy "$RUNNER_TEMP/type-ota" \
-            --prod --yes --token "$VERCEL_TOKEN"
-
       - name: Verify OTA deployment
         shell: bash
         run: |
@@ -356,7 +348,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ needs.setup.outputs.tag }}
           VERSION: ${{ needs.setup.outputs.version }}
-          OTA_BASE_URL: ${{ vars.IOS_AD_HOC_BASE_URL || 'https://type-ota.vercel.app' }}
+          OTA_BASE_URL: ${{ vars.IOS_AD_HOC_BASE_URL }}
         run: |
           set -euo pipefail
           RELEASE_NOTES="Ad-hoc iOS release $VERSION. Install on a registered device from $OTA_BASE_URL in Safari."
