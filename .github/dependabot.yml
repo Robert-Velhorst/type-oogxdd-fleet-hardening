@@ -12,3 +12,15 @@ updates:
     directory: /
     schedule:
       interval: weekly
+  - package-ecosystem: rust-toolchain
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: gradle
+    directory: /apps/mobile/android
+    schedule:
+      interval: weekly
+  - package-ecosystem: swift
+    directory: /apps/mobile/ios/App/CapApp-SPM
+    schedule:
+      interval: weekly
