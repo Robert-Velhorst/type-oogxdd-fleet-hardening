@@ -167,27 +167,6 @@ const landingPage = (meta, manifestUrl) => `<!doctype html>
 </html>
 `;
 
-/** Vercel/Netlify-style hosts guess wrong content types for these two. */
-const vercelConfig = () =>
-  JSON.stringify(
-    {
-      headers: [
-        {
-          source: "/manifest.plist",
-          headers: [{ key: "Content-Type", value: "text/xml; charset=utf-8" }],
-        },
-        {
-          source: `/${IPA_NAME}`,
-          headers: [
-            { key: "Content-Type", value: "application/octet-stream" },
-          ],
-        },
-      ],
-    },
-    null,
-    2
-  ) + "\n";
-
 const build = async (ipaPath, flags) => {
   const baseUrl = typeof flags["base-url"] === "string" ? flags["base-url"] : null;
   if (!baseUrl) {
@@ -212,7 +191,6 @@ const build = async (ipaPath, flags) => {
     join(out, "index.html"),
     landingPage(meta, `${root}/manifest.plist`)
   );
-  await writeFile(join(out, "vercel.json"), vercelConfig());
 
   const { size } = await stat(join(out, IPA_NAME));
   console.log(`${meta.title} ${meta.shortVersion} (${meta.build}) — ${meta.bundleId}`);
