@@ -23,6 +23,9 @@ on:
       - ".github/workflows/ffi-bindings-check.yml"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   surface:
     runs-on: ubuntu-latest

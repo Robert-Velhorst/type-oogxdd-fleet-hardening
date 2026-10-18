@@ -19,9 +19,13 @@ concurrency:
   group: mobile-adhoc-${{ github.ref }}
   cancel-in-progress: false
 
+permissions: {}
+
 jobs:
   setup:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       version: ${{ steps.parse.outputs.version }}
       tag: ${{ steps.parse.outputs.tag }}
