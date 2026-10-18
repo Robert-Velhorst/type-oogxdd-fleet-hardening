@@ -473,7 +473,7 @@ pub(crate) fn hash_file(path: &Path) -> Result<(String, u64), String> {
         hasher.update(&buffer[..read]);
         byte_length = byte_length.saturating_add(read as u64);
     }
-    let sha256 = format!("{:x}", hasher.finalize());
+    let sha256 = hex::encode(hasher.finalize());
     Ok((sha256, byte_length))
 }
 

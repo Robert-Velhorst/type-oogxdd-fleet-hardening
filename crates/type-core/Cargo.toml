@@ -13,15 +13,15 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 regex = "1"
 git2 = { version = "0.20", features = ["vendored-openssl"] }
-base64 = "0.22"
+base64 = "0.23"
 reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
-uuid = { version = "1", features = ["v7"] }
+uuid = { version = "1", features = ["v4", "v7"] }
 time = { version = "0.3", features = ["formatting", "macros", "parsing"] }
 argon2 = "0.5"
 chacha20poly1305 = { version = "0.10", features = ["std"] }
 zeroize = "1.8"
-zip = { version = "0.6", default-features = false, features = ["deflate"] }
-mdns-sd = "0.20.0"
+zip = { version = "4.6", default-features = false, features = ["deflate"] }
+mdns-sd = "0.21.5"
 ssh-key = { version = "0.6", features = ["ed25519"] }
 rand_core = { version = "0.6", features = ["std"] }
 iroh = { version = "1.0.3", default-features = false, features = ["tls-ring"] }
@@ -31,9 +31,10 @@ iroh-tickets = "1.0.0"
 # pre-production stability boundary.
 iroh-blobs = "0.103.0"
 tokio = { version = "1.52.3", features = ["rt-multi-thread", "io-util", "net", "time", "macros", "sync"] }
-sha2 = "0.10"
+sha2 = "0.11.1"
+hex = "0.4.3"
 subtle = "2"
 
 [target.'cfg(not(any(target_os = "ios", target_os = "android")))'.dependencies]
-russh = { version = "0.62.2", default-features = false, features = ["ring", "flate2"] }
+russh = { version = "0.64.1", default-features = false, features = ["ring", "flate2"] }
 tokio = { version = "1.52.3", features = ["process"] }

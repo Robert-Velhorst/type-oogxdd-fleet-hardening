@@ -59,10 +59,10 @@ fn add_path_to_zip(
         return Ok(());
     }
 
-    let file_options = FileOptions::default()
+    let file_options: FileOptions<'_, ()> = FileOptions::default()
         .compression_method(zip::CompressionMethod::Deflated)
         .unix_permissions(0o644);
-    let directory_options = FileOptions::default()
+    let directory_options: FileOptions<'_, ()> = FileOptions::default()
         .compression_method(zip::CompressionMethod::Stored)
         .unix_permissions(0o755);
 
@@ -189,7 +189,7 @@ pub fn create_profiles_backup_zip_impl(
 
     let output = fs::File::create(&archive_path).map_err(|error| error.to_string())?;
     let mut zip = zip::ZipWriter::new(output);
-    let metadata_file_options = FileOptions::default()
+    let metadata_file_options: FileOptions<'_, ()> = FileOptions::default()
         .compression_method(zip::CompressionMethod::Deflated)
         .unix_permissions(0o644);
 

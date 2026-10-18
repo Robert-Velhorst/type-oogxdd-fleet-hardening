@@ -19,9 +19,13 @@ concurrency:
   group: mobile-adhoc-${{ github.ref }}
   cancel-in-progress: false
 
+permissions: {}
+
 jobs:
   setup:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       version: ${{ steps.parse.outputs.version }}
       tag: ${{ steps.parse.outputs.tag }}
@@ -99,10 +103,6 @@ jobs:
       IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
       IOS_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
       IOS_AD_HOC_DEVICE_UDIDS: ${{ secrets.IOS_AD_HOC_DEVICE_UDIDS }}
-      OTA_BASE_URL: ${{ vars.IOS_AD_HOC_BASE_URL || 'https://type-ota.vercel.app' }}
-      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID || 'team_BfDOMB3NjBU2lgN9aNtFtJKC' }}
-      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID || 'prj_hQJ2vJZY73nDFw2gl2jPrXZU5ZC8' }}
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -113,7 +113,7 @@ jobs:
           sudo xcode-select -s /Applications/Xcode_26.6.app/Contents/Developer
           xcodebuild -version
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 26
           cache: npm
@@ -134,21 +134,13 @@ jobs:
             APP_STORE_CONNECT_PRIVATE_KEY \
             IOS_DISTRIBUTION_CERTIFICATE_BASE64 \
             IOS_DISTRIBUTION_CERTIFICATE_PASSWORD \
-            VERCEL_ORG_ID \
-            VERCEL_PROJECT_ID \
-            VERCEL_TOKEN \
-            IOS_AD_HOC_DEVICE_UDIDS \
-            OTA_BASE_URL
+            IOS_AD_HOC_DEVICE_UDIDS
           do
             [ -n "${!name:-}" ] || {
               echo "Missing required secret or variable: $name" >&2
               exit 1
             }
           done
-          [[ "$OTA_BASE_URL" == https://* ]] || {
-            echo "IOS_AD_HOC_BASE_URL must begin with https://, got $OTA_BASE_URL." >&2
-            exit 1
-          }
 
       - name: Install dependencies
         run: npm ci
@@ -291,39 +283,9 @@ jobs:
           [ "$PROFILE_COUNT" -gt 0 ]
           echo "Verified $ACTUAL_BUNDLE $ACTUAL_VERSION ($ACTUAL_BUILD) and $PROFILE_COUNT provisioning profile(s)."
 
-      - name: Build OTA install site
-        run: |
-          npm run ota -w @typenotes/mobile -- build \
-            "$RUNNER_TEMP/type-export-adhoc/Type.ipa" \
-            --base-url "$OTA_BASE_URL" \
-            --out "$RUNNER_TEMP/type-ota"
-
-      - name: Deploy OTA site to Vercel
-        run: |
-          set -euo pipefail
-          npx --yes vercel@59.11.2 deploy "$RUNNER_TEMP/type-ota" \
-            --prod --yes --token "$VERCEL_TOKEN"
-
-      - name: Verify OTA deployment
-        shell: bash
-        run: |
-          set -euo pipefail
-          curl --fail --silent --show-error --location \
-            --retry 5 --retry-all-errors --retry-delay 5 \
-            -o /dev/null "$OTA_BASE_URL/"
-          MANIFEST="$(curl --fail --silent --show-error --location \
-            --retry 5 --retry-all-errors --retry-delay 5 \
-            "$OTA_BASE_URL/manifest.plist")"
-          printf '%s' "$MANIFEST" | grep -Fq "$OTA_BASE_URL/Type.ipa"
-          printf '%s' "$MANIFEST" | grep -Fq "$MOBILE_VERSION"
-          curl --fail --silent --show-error --location \
-            --retry 5 --retry-all-errors --retry-delay 5 \
-            --range 0-0 -o /dev/null "$OTA_BASE_URL/Type.ipa"
-          echo "Ad-hoc build is available at $OTA_BASE_URL"
-
       - name: Upload IPA artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: type-ios-adhoc-${{ needs.setup.outputs.tag }}
           path: ${{ runner.temp }}/type-export-adhoc/Type.ipa
@@ -356,10 +318,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ needs.setup.outputs.tag }}
           VERSION: ${{ needs.setup.outputs.version }}
-          OTA_BASE_URL: ${{ vars.IOS_AD_HOC_BASE_URL || 'https://type-ota.vercel.app' }}
         run: |
           set -euo pipefail
-          RELEASE_NOTES="Ad-hoc iOS release $VERSION. Install on a registered device from $OTA_BASE_URL in Safari."
+          RELEASE_NOTES="Ad-hoc iOS release $VERSION. Download the attached IPA for installation on a registered device."
           if gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
             gh release edit "$TAG" \
               --repo "${{ github.repository }}" \
