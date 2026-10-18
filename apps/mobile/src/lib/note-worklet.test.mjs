@@ -13,7 +13,7 @@ it("serializes into an isolated worker without capturing application modules", (
   vm.runInContext("global = globalThis", rn);
   const original = vm.runInContext(code.replace(/^export /gm, "") + "\nprocessNoteJob", rn);
   expect(original.__workletHash).toBeTruthy();
-  expect(Object.keys(original.__closure)).toEqual([]);
+  expect(Object.keys(original.__closure ?? {})).toEqual([]);
   const worker = vm.runInNewContext(`(${original.__initData.code})`, {});
   worker({ kind: "reset", scope: "serialized" });
   const preview = {

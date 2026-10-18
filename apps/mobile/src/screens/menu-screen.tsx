@@ -324,7 +324,7 @@ export const MenuScreen = () => {
                     {folderNoteCount(archive) || ""} ›
                   </Text>
                 </Pressable>
-              ) : null
+              ) : undefined
             }
             ListEmptyComponent={
               <Text style={[styles.empty, { color: theme.colors.secondaryText }]}>
