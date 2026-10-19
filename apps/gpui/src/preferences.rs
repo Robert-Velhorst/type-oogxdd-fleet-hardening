@@ -102,21 +102,27 @@ mod tests {
     }
     #[test]
     fn development_identity_and_explicit_paths_are_isolated() {
+        let temp_dir = std::env::temp_dir().join("type-gpui-preferences-test");
+        let default_data_dir = temp_dir.join("data");
+        let explicit_data_dir = temp_dir.join("fixture");
         assert!(
-            environment(&["--dev".into()], Path::new("/tmp/data"))
+            environment(&["--dev".into()], &default_data_dir)
                 .unwrap()
                 .app_data_dir
                 .ends_with("com.digital.type2.gpui.dev")
         );
         assert_eq!(
             environment(
-                &["--data-dir".into(), "/tmp/fixture".into()],
-                Path::new("/tmp/data")
+                &[
+                    "--data-dir".into(),
+                    explicit_data_dir.to_string_lossy().into_owned(),
+                ],
+                &default_data_dir
             )
             .unwrap()
             .app_data_dir,
-            PathBuf::from("/tmp/fixture")
+            explicit_data_dir
         );
-        assert!(environment(&["--data-dir".into(), "relative".into()], Path::new("/tmp")).is_err());
+        assert!(environment(&["--data-dir".into(), "relative".into()], &temp_dir).is_err());
     }
 }
