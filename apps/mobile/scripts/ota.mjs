@@ -242,7 +242,6 @@ const serve = async (ipaPath, flags) => {
     console.log(`serving ${basename(ipaPath)} (${(size / 1e6).toFixed(1)} MB)\n`);
     console.log("iOS needs a trusted HTTPS origin, so put a tunnel in front:");
     console.log(`  cloudflared tunnel --url http://localhost:${port}`);
-    console.log(`  ngrok http ${port}`);
     console.log("\nThen open the tunnel's https URL in Safari on the device.");
   });
 };
